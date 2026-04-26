@@ -2,7 +2,7 @@ using Lab.Interfaces;
 using System;
 using System.Security.Cryptography;
 using System.Text;
-using System.Linq
+using System.Linq;
 
 namespace Lab.Implementations.GenCode3;
 
