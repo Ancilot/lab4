@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using Lab.Interfaces;
+using System.Collections.Generic;
 
 namespace Lab.Implementations.GenCode2;
 
