@@ -1,9 +1,7 @@
 using NUnit.Framework;
 using Lab.Interfaces;
 using System;
-using Lab.Implementations.GenCode1;
-//using Lab.Implementations.GenCode2;
-//using Lab.Implementations.GenCode3;
+using Lab.Implementations.GenCode2;
 
 namespace Tests;
 
