@@ -110,8 +110,8 @@ public class PasswordTests
     [Test]
     public void ChangePassword_ValidData_PasswordChanged()
     {
-        string oldPassword = "OldPa05ss123!";
-        string newPassword = "New200Pass456!";
+        string oldPassword = "OldP@ss123!";
+        string newPassword = "NewP@ss456!"; 
 
         Assert.That(() => _password.ChangePassword(oldPassword, newPassword), Throws.Nothing);
 
