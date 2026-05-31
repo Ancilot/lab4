@@ -14,4 +14,9 @@
     <ProjectReference Include="..\Implementations\Implementations.csproj" />
     <ProjectReference Include="..\Interfaces\Interfaces.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="PasswordTests.cs" />
+    <Compile Include="PasswordTests_Generated.cs" />
+  </ItemGroup>
 </Project>
