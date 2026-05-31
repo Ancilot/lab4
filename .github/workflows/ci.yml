@@ -1,33 +1,45 @@
-name: .NET CI Pipeline (NUnit)
+name: CI - Generate & Run NUnit Tests
 
 on:
   push:
-    branches: 
-      - main
-      - version-1
-      - version-2
-      - version-3
+    branches: [ main, version-1, version-2, version-3 ]
   pull_request:
-    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
-  build-and-test:
+  test-generation-and-execution:
     runs-on: ubuntu-latest
     
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: pip install pyyaml
+      
+      - name: Generate NUnit tests
+        run: python generator/gen_tests.py --config config.yaml
       
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 6.0.x
-          
-      - name: Restore dependencies
-        run: dotnet restore
+          dotnet-version: '6.0.x'
+      
+      - name: Restore & Build
+        run: dotnet build
         
-      - name: Build
-        run: dotnet build --no-restore
-        
-      - name: Test
-        run: dotnet test --no-build --verbosity normal
+      - name: Run Tests
+        run: dotnet test --verbosity normal
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            **/TestResults/
+            **/*.trx

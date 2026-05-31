@@ -1,0 +1,4 @@
+target_language: csharp
+test_framework: nunit
+spec_path: spec/password.yaml
+output_dir: tests/
