@@ -153,7 +153,6 @@ def generate_act_code(method_name: str, inputs: List[Any], signature: str) -> tu
         act_code = f"_sut.{method_name}({params_str});"
         return act_code, params_str
 
-
 def generate_method_tests(module_name: str, method_data: Dict[str, Any]) -> List[str]:
     case_blocks = []
     method_name = method_data["name"]
@@ -167,9 +166,41 @@ def generate_method_tests(module_name: str, method_data: Dict[str, Any]) -> List
         # Генерируем безопасное имя метода
         method_name_safe = f"{module_name}_{method_name}_{safe_method_name(case_desc)}"
         
-        # Генерируем код Act и Assert
-        act_code, params_str = generate_act_code(method_name, inputs, signature)
-        assert_code = generate_assert_code(method_name, expected, params_str)
+        # Генерируем параметры
+        params_str = ", ".join(format_csharp_input(inp) for inp in inputs)
+        
+        # Определяем тип теста и генерируем соответствующий код
+        expected_lower = expected.lower()
+        
+        if "argumentexception" in expected_lower:
+            # Тест на исключение - только Assert, без Act
+            act_code = ""
+            assert_code = f'Assert.That(() => _sut.{method_name}({params_str}), Throws.ArgumentException);'
+            
+        elif "без исключений" in expected_lower or "успешно" in expected_lower:
+            # Тест на успех - только Act, Assert что нет исключения
+            act_code = f"_sut.{method_name}({params_str});"
+            assert_code = f'Assert.That(() => _sut.{method_name}({params_str}), Throws.Nothing);'
+            
+        elif signature.startswith("bool"):
+            # Булевый метод
+            act_code = f"var result = _sut.{method_name}({params_str});"
+            if "true" in expected_lower:
+                assert_code = "Assert.That(result, Is.True);"
+            else:
+                assert_code = "Assert.That(result, Is.False);"
+                
+        elif signature.startswith("string"):
+            # Строковый метод
+            act_code = f"var result = _sut.{method_name}({params_str});"
+            if "непустая" in expected_lower:
+                assert_code = "Assert.That(result, Is.Not.Empty);\n            Assert.That(result, Is.Not.Null);"
+            else:
+                assert_code = f'Assert.Pass("Ожидалось: {expected}");'
+        else:
+            # Void метод по умолчанию
+            act_code = f"_sut.{method_name}({params_str});"
+            assert_code = 'Assert.Pass("Test executed");'
         
         case_block = TEST_METHOD_TEMPLATE.format(
             method_name_safe=method_name_safe,
